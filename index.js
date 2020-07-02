@@ -3,6 +3,65 @@ const contents = document.getElementById('contents');
 
 window.addEventListener("load", init);
 
+function init(){
+  contents.style.display = 'block';
+  loading.style.display = 'none';
+
+  const width = innerWidth;
+  const height = innerHeight;
+
+  const renderer = new THREE.WebGLRenderer({
+    canvas: document.querySelector('#myCanvas')
+  })
+  renderer.setPixelRatio(devicePixelRatio);
+  renderer.setSize(width,height);
+  const scene = new THREE.Scene();
+
+  const camera = new THREE.PerspectiveCamera(
+    75, width/ height
+  );
+  camera.position.set(0,0,+1000);
+  camera.aspect = width / height;
+  camera.updateProjectionMatrix();
+
+  const controls = new THREE.OrbitControls(camera,document.getElementById('myCanvas'));
+
+  const geometry = new THREE.BoxGeometry(500,500,500);
+  const textureLoader = new THREE.TextureLoader();
+  const texture0 = textureLoader.load('./img/puzzleright.jpg');
+  const texture1 = textureLoader.load('./img/puzzleleft.jpg');
+  const texture2 = textureLoader.load('./img/puzzleup.jpg');
+  const texture3 = textureLoader.load('./img/puzzledown.jpg');
+  const texture4 = textureLoader.load('./img/puzzlefront.jpg');
+  const texture5 = textureLoader.load('./img/puzzlebottom.jpg');
+
+  const materials = [
+    new THREE.MeshBasicMaterial( { map: texture0 } ),
+    new THREE.MeshBasicMaterial( { map: texture1 } ),
+    new THREE.MeshBasicMaterial( { map: texture2 } ),
+    new THREE.MeshBasicMaterial( { map: texture3 } ),
+    new THREE.MeshBasicMaterial( { map: texture4 } ),
+    new THREE.MeshBasicMaterial( { map: texture5 } )
+  ];
+  const faceMaterial = new THREE.MeshFaceMaterial( materials );
+  const box = new THREE.Mesh(geometry,faceMaterial);
+  scene.add(box);
+  
+  const light = new THREE.DirectionalLight(0xffffff);
+    light.intensity = 2; // 光の強さを倍に
+  light.position.set(1, 1, 1);
+  // シーンに追加
+  scene.add(light);
+
+
+  tick();
+
+  function tick(){
+    requestAnimationFrame(tick);
+    // box.rotation.y += 0.01;
+    renderer.render(scene,camera)
+  }
+}
 // function init() {
 //   contents.style.display = 'block';
 //   loading.style.display = 'none';
@@ -177,59 +236,3 @@ window.addEventListener("load", init);
 // }
 // render();
 // }
-
-function init() {
-    contents.style.display = 'block';
-  loading.style.display = 'none';
-
-  // サイズを指定
-  const width = 960;
-  const height = 540;
-
-  // レンダラーを作成
-  const renderer = new THREE.WebGLRenderer({
-    canvas: document.querySelector('#myCanvas')
-  });
-  renderer.setSize(width, height);
-
-  // シーンを作成
-  const scene = new THREE.Scene();
-
-  // カメラを作成
-  const camera = new THREE.PerspectiveCamera(45, width / height);
-  camera.position.set(0, 0, +1000);
-  const controls = new THREE.OrbitControls(camera,document.getElementById('myCanvas'));
-  controls.enableDamping = true;
-  controls.dampingFactor = 0.2;
-
-  // 球体を作成
-  const geometry = new THREE.SphereGeometry(300, 30, 30);
-  // 画像を読み込む
-  const loader = new THREE.TextureLoader();
-  const texture = loader.load('./img/earth.jpg');
-  // マテリアルにテクスチャーを設定
-  const material = new THREE.MeshStandardMaterial({
-    map: texture
-  });
-  // メッシュを作成
-  const mesh = new THREE.Mesh(geometry, material);
-  // 3D空間にメッシュを追加
-  scene.add(mesh);
-
-  // 平行光源
-  const directionalLight = new THREE.DirectionalLight(0xffffff);
-  directionalLight.position.set(1, 1, 1);
-  // シーンに追加
-  scene.add(directionalLight);
-
-  tick();
-
-  // 毎フレーム時に実行されるループイベントです
-  function tick() {
-    controls.update();
-    // レンダリング
-    renderer.render(scene, camera);
-
-    requestAnimationFrame(tick);
-  }
-}
